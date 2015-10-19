@@ -1,0 +1,42 @@
+#progressLayout {
+	width: calc(100% - 40px);
+	height: calc(100% - 40px);
+	margin: 20px;
+	position: fixed;
+	top: 0;
+	z-index: 10000000;
+	background: rgba(218, 217, 242, 0.97);
+  	-webkit-filter: blur(40px);
+	border-radius: 5px;
+}
+#printProgress {
+	width: 40%;
+	position: fixed;
+	z-index: 10000001;
+	-webkit-filter: blur(1px);
+	top: 44%;
+	left: 30%;
+}
+
+
+#printWrapper .tbTile {
+	width: 162px !important;
+	height: 109px !important;
+	margin: 0;
+}
+#printWrapper .tbTileContent {
+	border: 2px solid #f2cb1d !important;
+	border-left: 6px solid #f2cb1d !important;
+}
+#printWrapper .witTitle {
+	height: 66px !important;
+}
+
+body.printView .main-container {
+	display: none !important;
+}
+@media print {
+	#goBack {
+		display: none;
+	}
+}
