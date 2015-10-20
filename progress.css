@@ -39,6 +39,10 @@
     overflow: hidden;
 }
 
+#printWrapper .witRemainingWork {
+    float: right;
+}
+
 body.printView .main-container {
     display: none !important;
 }
