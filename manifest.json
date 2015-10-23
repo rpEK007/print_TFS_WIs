@@ -3,7 +3,7 @@
 
   "name": "Print TFS_2015 Work Items (temp)",
   "description": "This extension allows you to print TFS Work Items right from your Chrome",
-  "version": "0.6",
+  "version": "0.7",
 
   "page_action": {
     "default_icon": "icon.png",
