@@ -10,7 +10,7 @@ function checkForTFS(tab) {
 	var a = document.createElement ('a');
 
     a.href = tab.url;
-    if (a.hostname == "eservicestfs.nt.local") {
+    if (/tfs/i.test(tab.url.split('/').slice(0,4).join('/'))) {
         chrome.pageAction.show(tab.id);
     }
 };
