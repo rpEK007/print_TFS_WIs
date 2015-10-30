@@ -27,6 +27,7 @@
     float: left;
     padding: 5px;
     margin: 1px;
+    position: relative;
 }
 
 .tbTile .tbTileContent {
@@ -35,9 +36,20 @@
 }
 
 #printWrapper .witTitle {
-    height: 66px;
-    min-height: 66px;
+    height: 51px;
+    min-height: 51px;
     overflow: hidden;
+}
+
+#printWrapper .witExtra {
+    width: 160px;
+    position: absolute;
+    bottom: 0;
+    margin: 0;
+}
+
+#printWrapper .witAssignedTo .onTileEditTextDiv {
+    height: 20px;
 }
 
 #printWrapper .witRemainingWork {
