@@ -1,24 +1,9 @@
-#progressLayout {
-    width: calc(100% - 40px);
-    height: calc(100% - 40px);
-    margin: 20px;
-    position: fixed;
-    top: 0;
-    z-index: 10000000;
-    background: rgba(218, 217, 242, 0.97);
-    -webkit-filter: blur(40px);
-    border-radius: 5px;
+.ellipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline-block;
 }
-
-#printProgress {
-    width: 40%;
-    position: fixed;
-    z-index: 10000001;
-    -webkit-filter: blur(1px);
-    top: 44%;
-    left: 30%;
-}
-
 #printWrapper .tbTile {
     width: 174px !important;
     height: 99px;
@@ -48,8 +33,12 @@
     margin: 0;
 }
 
+#printWrapper .witAssignedTo {
+    float: left;
+}
 #printWrapper .witAssignedTo .onTileEditTextDiv {
     height: 20px;
+    width: 110px;
 }
 
 #printWrapper .witRemainingWork {

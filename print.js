@@ -1,138 +1,94 @@
-printTasks = function (tag, scrollingSpeed) {
-	BUG_COLOR = "rgb(204, 41, 61)";
-	PBI_COLOR = "rgb(0, 156, 204)";
+function generateBaseURL(withProject) {
+	return location.origin + location.pathname.split('/').splice(0, withProject ? 4 : 3).join('/') + '/_apis/wit/';
+};
 
-	containerEl = $('.ui-draggable');
-	containerEl.scrollTop(0);
+printTasks = function (wiql) {
+	var pluck = function(arr, key) { 
+			return arr.map(function(e) { return e[key]; }) 
+		},
+		fields = [];
 
-	setTimeout(fullfillContainer, 0);
-	function onTaskGenerated(e) {
-		containerClone.append($(e.target).clone());
-	}
-
-	function fullfillContainer() {
-		scrollingSpeed = scrollingSpeed || 200;
-		containerClone = containerEl.clone();
-		containerEl.on('DOMNodeInserted', onTaskGenerated);
-		scrollTop = 0;
-		controlShots = 5;
-		startProgress();
-		interval = setInterval(scrollContainer, 40);
-	};
-
-	function scrollContainer() {
-		scrollTop += scrollingSpeed
-		containerEl.scrollTop(scrollTop);
-		if (containerEl[0].scrollTop < scrollTop) {
-			if (controlShots-- < 1) {
-				clearInterval(interval);
-				finishProgress();
+	$.ajax({
+		url: generateBaseURL(true) + 'wiql?api-version=1.0',
+		type: "POST",
+		data: JSON.stringify({query: decodeURIComponent(wiql)}),
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function (response) {
+			var ids = pluck(response.workItems, 'id');
+			
+			if (!ids.length) {
+				return alert('No items for current query');
 			}
-		} else {
-			updateProgress(
-				containerEl[0].scrollTop/
-					(containerEl[0].scrollHeight - containerEl.parent().height())
+
+			$.get(
+				generateBaseURL(false) + 'WorkItems?api-version=1.0&$expand=relations&ids=' + ids.join(','),
+				function (items) {
+					items.value.forEach(parseItem);
+					printItems();
+				}
 			);
 		}
-	};
+	});
 
-	function startProgress() {
-		$('body').append('<div id="progressLayout"></div>' + 
-			'<progress max="100" id="printProgress" value="0"></progress>');	
-	};
+	function parseItem(item) {
+		var result = {
+				id: item.id,
+				type: item.fields['System.WorkItemType'],
+				assignee: item.fields['System.AssignedTo'] || '',
+				title: item.fields['System.Title'],
+				remainingWork: item.fields['Microsoft.VSTS.Scheduling.RemainingWork'] || '',
+				parent: ''
+			};
 
-	function updateProgress(progress) {
-		$('#printProgress').val(+progress*100);
-	};
-
-	function finishProgress(progress) {
-		containerEl.off('DOMNodeInserted', onTaskGenerated);
-		$('body').addClass('printView').append('<div id="printWrapper"></div>').find('#printWrapper').append(containerClone);
-		$('#progressLayout, #printProgress').remove();
-		continuePrint();
-	};
-
-	function continuePrint() {
-		currentStoryId = '';
-		cards = [];
-
-		if (/UI|BE|QC/.test(tag)) {
-			printWorkItems();
-		} else if (tag === 'BUG') {
-			printDefects();
-		} else {
-			printStories();
+		if (item.relations) {
+			item.relations.forEach(function (relation) {
+				if (relation.rel === 'System.LinkTypes.Hierarchy-Reverse') {
+					result.parent = relation.url.split('/').slice(-1)[0]
+				}
+			})
 		}
 
-		fillPrintWrapper();
-		containerClone.remove();
-		containerClone = null;
-		print();
-	};
+		fields.push(result);
+	}
 
-	function fillPrintWrapper() {
-		$('#printWrapper').html('<button id="goBack">Back To TFS</button><div id="TFS-Tasks"></div>').find('#TFS-Tasks').html(cards);
+	function printItems() {
+		$('body').addClass('printView')
+			.append(
+				'<div id="printWrapper">' + 
+					'<button id="goBack">Back To TFS</button>' + 
+					'<div id="TFS-Tasks"></div>' + 
+				'</div>'
+			).find('#TFS-Tasks').html($.map(fields, createCardEl));
+
 		$('#goBack').click(function () {
 			$('body').removeClass('printView').find('#printWrapper').remove();
-			containerEl.scrollTop(0);
 
 			script = document.createElement('script');
 			script.textContent = '$(window).trigger("resize");';
 			(document.head||document.documentElement).appendChild(script);
 			script.parentNode.removeChild(script);
 		});
+
+		print();
 	};
 
-	function printWorkItems() {
-		$('#printWrapper .grid-row-normal').each(function (key, el) {
-			var $el = $(el);
-
-			if ($el.hasClass('user-story-grid-row')) {
-				currentStoryId = $el.children().eq(1).text();
-			} else if ($el.find('.tag-item[title="' + tag + '"]').length) {
-				cards.push(createCardEl($el, 4));
-			}
-		});
-	};
-
-	function printDefects() {
-		printStoryLevelItems(BUG_COLOR);
-	};
-
-	function printStories() {
-		printStoryLevelItems(PBI_COLOR);
-	};
-
-	function printStoryLevelItems(color) {
-		$('#printWrapper .user-story-grid-row').each(function () {
-			var $el = $(this);
-
-			if ($el.find('.work-item-color').css('background-color') === color) {
-				cards.push(createCardEl($el, 5));
-			}
-		});
-	};
-
-	function createCardEl($el, remainingWorkPosition) {
-		var children = $el.children(),
-			id = children.eq(1).text(),
-			description = children.eq(2).text(),
-			assignee = children.eq(3).text(),
-			remainingWork = children.eq(remainingWorkPosition).text();
-			
-		return $('<div class="tbTile ui-draggable propagate-keydown-event" tabindex="0" aria-disabled="false">' +
+	function createCardEl(item) {
+		return $(
+			'<div class="tbTile ui-draggable propagate-keydown-event" tabindex="0" aria-disabled="false">' +
 			    '<div class="tbTileContent">' +
-			    	'<div style="font-weight: bold;">' + currentStoryId + '</div>' + 
-			        '<div class="witTitle ellipsis clickableTitle">' + id + ': ' + description + '</div>' +
+			    	'<div style="font-weight: bold;">' + item.parent + '</div>' + 
+			        '<div class="witTitle clickableTitle">' + item.id + ': ' + item.title + '</div>' +
 			        '<div class="witExtra">' +
-			            '<div class="onTileEditDiv non-combo-behavior witRemainingWork">' +
-			                '<div class="onTileEditTextDiv ellipsis">' + remainingWork + '</div>' +
-			            '</div>' +
 			            '<div class="onTileEditDiv non-combo-behavior witAssignedTo ellipsis">' +
-			                '<div class="onTileEditTextDiv ellipsis">' + assignee + '</div>' +
+			                '<div class="onTileEditTextDiv ellipsis">' + item.assignee + '</div>' +
+			            '</div>' +
+			            '<div class="onTileEditDiv non-combo-behavior witRemainingWork">' +
+			                '<div class="onTileEditTextDiv">' + item.remainingWork + '</div>' +
 			            '</div>' +
 			        '</div>' +
 			    '</div>' +
-			'</div>');
+			'</div>'
+		);
 	};
 };

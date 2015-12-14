@@ -2,69 +2,38 @@ body {
   margin: 0;
   -webkit-user-select: none;
 }
-form {
-  width: 222px;
-  color: #FFF;
+ul {
+    padding-left: 5px;
+    list-style: none;
 }
-label, input {
-  display: inline-block;
-}
-label {
-  width: 44px;
-  height: 21px;
-  position: relative;
-  float: left;
-  text-align: center;
-  font-size: 18px;
-  border-radius: 4px;
-  padding: 10px 15px;
-  margin-bottom: 8px;
-}
-label:hover {
-  cursor: pointer;
-}
-input {
-  width: 20px;
-  height: 20px;
-  display: none;
-}
-input:checked+label {        
+input:checked+label {
   -webkit-box-shadow: #686868 0px 0px 34px -1px inset;
 }
-[for=UI] {
-  background-color: #1FB42D;
+li {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
 }
-[for=BE] {
-  background-color: #499CE4;
+li.opener {
+  cursor: pointer;
+  font-weight: bold;
 }
-[for=QC] {
-  color: #000;
-  background-color: #F8EB68;
+li.opener:before {
+  content: '-';
 }
-[for=BUG] {
-  background-color: #FF4E4E;
+li.opener.closed:before {
+  content: '+';
 }
-[for=PBI] {
-  color: #000;
-  background-color: #E8E8E8;
+li.opener.closed~* {
+  display: none;
 }
-
-[for=UI]:hover {
-  background-color: #09A717;
+#queriesContainer {
+  width: 300px;
+  height: 300px;
+  overflow: auto;
 }
-[for=BE]:hover {
-  background-color: #4492D4;
-}
-[for=QC]:hover {
-  background-color: #EEE051;
-}
-[for=BUG]:hover {
-  background-color: #FA3A3A;
-}
-[for=PBI]:hover {
-  background-color: #D8D8D8;
-}
-
 hr {
     clear: left;
 }
@@ -80,28 +49,6 @@ button {
   cursor: pointer;
   width: 111px;
 }
-
-#instructions {
-  display: none;
-  font-size: 14px;
-  font-weight: bold;
-  color: #010187;
-}
-.showInstructions form {
-  display: none;
-}
-.showInstructions #instructions {
-  display: block;
-  width: 604px
-}
-#instructionsButton {
-  background: #FFF;
-  color: #000;
-}
-#optionsButton {
-  background: #FFF;
-  color: #000;
-  width: 60px;
-  float: left;
-  height: 600px;
+.sub-option {
+  padding-left: 10px;
 }
