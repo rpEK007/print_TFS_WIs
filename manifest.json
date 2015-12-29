@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "Print TFS_2015 Work Items",
-  "description": "This extension allows you to print TFS 2015 Work Items right from your Chrome. Some restyling is to be done.",
-  "version": "1.1",
+  "description": "This extension allows you to print TFS 2015 Work Items right from your Chrome.",
+  "version": "1.2.5",
 
   "page_action": {
     "default_icon": "icon.png",

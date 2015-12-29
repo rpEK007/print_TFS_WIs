@@ -53,23 +53,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     $.each(queries, function (key, group) {
-      groupElement = createUL(group);
+      if (group.hasChildren) {
+        groupElement = createUL(group);
 
-      $.each(group.children, function (key, subGroup) {
-        if (subGroup.isFolder) {
-          if (subGroup.hasChildren) {
-            subGroupElement = createUL(subGroup);
+        $.each(group.children, function (key, subGroup) {
+          if (subGroup.isFolder) {
+            if (subGroup.hasChildren) {
+              subGroupElement = createUL(subGroup);
 
-            $.each(subGroup.children, addOption);          
-            groupElement.appendChild(subGroupElement);            
+              $.each(subGroup.children, addOption);          
+              groupElement.appendChild(subGroupElement);            
+            }
+          } else {
+            subGroupElement = groupElement;
+            addOption(null, subGroup);
           }
-        } else {
-          subGroupElement = groupElement;
-          addOption(null, subGroup);
-        }
-      });
+        });        
 
-      fragment.appendChild(groupElement);
+        fragment.appendChild(groupElement);
+      }
     });
 
     $('#queriesContainer').html(fragment);
